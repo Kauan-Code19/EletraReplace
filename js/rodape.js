@@ -1,5 +1,5 @@
 function carregarRodape() {
-    fetch('rodape.html')
+    fetch('../html/rodape.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-container').innerHTML = data;
