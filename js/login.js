@@ -32,5 +32,5 @@ function login(nome, senha) {
 }
 
 function telaDeTroca(operador) {
-    window.location.href = 'html/troca.html'
+    window.location.href = 'troca.html'
 }
