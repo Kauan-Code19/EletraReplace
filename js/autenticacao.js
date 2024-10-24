@@ -5,7 +5,7 @@ function estaAutenticado() {
         return
     }
 
-    window.location.href = '../html/login.html'
+    window.location.href = '../login.html'
 }
 
 window.onload = estaAutenticado
