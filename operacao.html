@@ -12,26 +12,18 @@
     <div class="container-fluid h-100 flex-grow-1">
         <div class="row justify-content-center align-items-center mt-5 h-100">
             <div class="col-md-4">
-                <h2 class="text-center mb-4" id="titleLogin">Login</h2>
-                <form id="loginForm">
-                    <div class="mb-3" id="divNome">
-                        <label for="nome" class="form-label">Nome</label>
-                        <input type="text" class="form-control" id="nome" placeholder="Digite seu nome" required>
-                    </div>
-                    <div class="mb-3" id="divSenha">
-                        <label for="senha" class="form-label">Senha</label>
-                        <input type="text" class="form-control" id="senha" placeholder="Digite sua Senha" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary mb-3 w-100" id="buttonEntrar">Entrar</button>
-                </form>
+                <h2 class="text-center mb-4" id="titleLogin">Escolha a Operação</h2>
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <button type="button" class="btn btn-primary mb-3 w-100" id="buttonTroca">Troca</button>
+                    <button type="button" class="btn btn-primary mb-3 w-100" id="buttonDoubleCheck">Double Check</button>
+                </div>
             </div>
         </div>
     </div>
     <div id="footer-container"></div>
 
     <script src="js/rodape.js"></script>
-    <script type="module" src="js/banco_de_dados.js"></script>
-    <script type="module" src="js/login.js"></script>
+    <script type="module" src="js/operacao.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+.background-color {
+    background-color: #f4f4f4,
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.container-fluid {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}

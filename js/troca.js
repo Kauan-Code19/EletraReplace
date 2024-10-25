@@ -1,25 +1,43 @@
-const maquinasPorLinha = {
-    SMT01: ["SM471A", "SM481B", "SM482A"],
-    SMT02: ["SM471C", "SM481D", "SM481C", "SM482B"],
-    SMT03: ["SM471B", "SM481A", "SM482C"]
-};
+import { buscarTodasAsMaquinas, buscarTodosOsFeeders } from "./banco_de_dados.js";
 
-const linhaSelect = document.getElementById('linha');
+const maquinas = buscarTodasAsMaquinas()
+const linhaSessionStorage = sessionStorage.getItem('linha');
 const maquinaSelect = document.getElementById('maquina');
 
-linhaSelect.addEventListener('change', function() {
-    const linhaSelecionada = this.value;
-    const maquinas = maquinasPorLinha[linhaSelecionada] || [];
+if (linhaSessionStorage) {
+    document.getElementById('linha').value = linhaSessionStorage;
+    preencherMaquinas(linhaSessionStorage);
+}
 
+function preencherMaquinas(linhaSelecionada) {
+    const maquinasPorLinha = maquinas[linhaSelecionada] || [];
     maquinaSelect.innerHTML = '<option value="" disabled selected>Selecione a máquina</option>';
 
-    maquinas.forEach(maquina => {
+    maquinasPorLinha.forEach(maquina => {
         const option = document.createElement('option');
         option.value = maquina;
         option.textContent = maquina;
         maquinaSelect.appendChild(option);
     });
-});
+}
+
+const feeders = buscarTodosOsFeeders()
+const indiceFeederSelect = document.getElementById('indiceFeeder');
+const numeroFeederSelect = document.getElementById('numeroFeeder');
+
+indiceFeederSelect.addEventListener('change', function() {
+    const indiceSelecionado = this.value;
+    const feedersPorIndice = feeders[indiceSelecionado] || [];
+
+    numeroFeederSelect.innerHTML = '<option value="" disabled selected>Selecione o Número do Feeder</option>';
+
+    feedersPorIndice.forEach(numeroFeeder => {
+        const option = document.createElement('option');
+        option.value = numeroFeeder;
+        option.textContent = numeroFeeder;
+        numeroFeederSelect.appendChild(option);
+    });
+})
 
 let html5QrCode;
 let pns = {
@@ -76,35 +94,31 @@ function iniciarLeituraQrCode(componente) {
     });
 }
 
-function compararPNs(pnDoComponenteUm, pnDoComponenteDois) {
-    if (pnDoComponenteUm !== pnDoComponenteDois) {
-        alert("As PNs são diferentes: " + pnDoComponenteUm + " vs " + pnDoComponenteDois);
+function compararPNs(pnDoComponenteAnterior, pnDoComponenteNovo) {
+    if (pnDoComponenteAnterior !== pnDoComponenteNovo) {
+        alert("As PNs são diferentes: " + pnDoComponenteAnterior + " vs " + pnDoComponenteNovo);
 
-        setarElementosComPNDiferente(pnDoComponenteUm, pnDoComponenteDois)
+        setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo)
 
         return
     }
 
-    alert("As PNs são iguais");
-
-    setarElementosComPNIgual(pnDoComponenteUm)
+    setarElementosComPNIgual(pnDoComponenteAnterior)
 }
 
-function setarElementosComPNDiferente(pnDoComponenteUm, pnDoComponenteDois) {
-    document.getElementById('verificarPNBtn').style.display = 'none';
+function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo) {
     document.getElementById('pn1InputContainer').style.display = 'block'; 
-    document.getElementById('pn1Input').value = pnDoComponenteUm;
+    document.getElementById('pn1Input').value = pnDoComponenteAnterior;
     document.getElementById('pn1Input').ariaRequired = true; 
     document.getElementById('pn2InputContainer').style.display = 'block'; 
-    document.getElementById('pn2Input').value = pnDoComponenteDois;
+    document.getElementById('pn2Input').value = pnDoComponenteNovo;
     document.getElementById('pn2Input').ariaRequired = true; 
     document.getElementById('observacaoContainer').style.display = 'block'; 
 }
 
-function setarElementosComPNIgual(pnDoComponenteUm) {
-    document.getElementById('verificarPNBtn').style.display = 'none';
+function setarElementosComPNIgual(pnDoComponenteAnterior) {
     document.getElementById('pnInputContainer').style.display = 'block'; 
-    document.getElementById('pnInput').value = pnDoComponenteUm;
+    document.getElementById('pnInput').value = pnDoComponenteAnterior;
     document.getElementById('pnInput').ariaRequired = true;
 }
 
@@ -120,24 +134,38 @@ document.getElementById('producaoForm').addEventListener('submit', async(event) 
 
     if (valoresFormulario.pnIguais) {
         compartilharPdfComPNIgual(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada)
+        limparFormulario()
         return
     }
 
     if (valoresFormulario.pn1 && valoresFormulario.pn2) {  
         compartilharPdfComPNDiferente(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada)
+        limparFormulario()
         return
     }
 })
 
+function limparFormulario() {
+    document.getElementById('maquina').value = '';
+    document.getElementById('numeroFeeder').value = '';
+    document.getElementById('pnInput').value = '';
+    document.getElementById('pn1Input').value = '';
+    document.getElementById('pn2Input').value = '';
+    document.getElementById('observacao').value = '';
+}
+
 function pegarValoresDoFormulario() {
     let operadorString = sessionStorage.getItem('operador');
     let operador = operadorString ? JSON.parse(operadorString) : null;
+    let op = sessionStorage.getItem('op')
+    let turno = sessionStorage.getItem('turno')
+    let linha = sessionStorage.getItem('linha')
 
     return {
         operador: operador ? operador.nome : '',
-        ordemProducao: document.getElementById('ordemProducao').value,
-        turno: document.getElementById('turno').value,
-        linha: document.getElementById('linha').value,
+        ordemProducao: op,
+        turno: turno,
+        linha: linha,
         maquina: document.getElementById('maquina').value,
         numeroFeeder: document.getElementById('numeroFeeder').value,
         pnIguais: document.getElementById('pnInput').value,
