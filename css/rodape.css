@@ -1,0 +1,7 @@
+footer {
+    height: auto; /* Defina a altura que você deseja para o rodapé */
+    background-color: #343a40;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}

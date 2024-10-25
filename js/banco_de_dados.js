@@ -25,6 +25,33 @@ const operadores = [
     { nome: "Fabrizio de Sousa Silva", senha: "fabrizio1234#"},
 ];
 
-export function buscarPorSenha(senha) {
+const maquinas = {
+    SMT01: ["SM471A", "SM481B", "SM482A"],
+    SMT02: ["SM471C", "SM481D", "SM481C", "SM482B"],
+    SMT03: ["SM471B", "SM481A", "SM482C"]
+};
+
+const Feeders = {
+    indiceF: Array.from({ length: 59 }, (_, i) => `F${i + 1}`),
+    indiceR: Array.from({ length: 59 }, (_, i) => `R${i + 1}`)
+}
+
+export function buscarOperadorPorSenha(senha) {
     return operadores.find(operador => operador.senha === senha);
+}
+
+export function buscarTodasAsMaquinas() {
+    return maquinas;
+}
+
+export function buscarTodosOsFeeders() {
+    return Feeders
+}
+
+export function buscarTodosOsFeedersPorIndice(indice) {
+    if (indice === 'F') {
+        return Feeders.indiceF
+    }
+
+    return Feeders.indiceR
 }

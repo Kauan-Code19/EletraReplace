@@ -1,8 +1,8 @@
-import { buscarPorSenha } from './banco_de_dados.js';
+import { buscarOperadorPorSenha } from './banco_de_dados.js';
 
-const form = document.getElementById('loginForm');
+const formLogin = document.getElementById('loginForm');
 
-form.addEventListener('submit', function(event) {
+formLogin.addEventListener('submit', function(event) {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value;
@@ -12,7 +12,7 @@ form.addEventListener('submit', function(event) {
 });
 
 function login(nome, senha) {
-    const operador = buscarPorSenha(senha)
+    const operador = buscarOperadorPorSenha(senha)
 
     if (!operador) {
         alert("Operador não registrado")
@@ -28,9 +28,9 @@ function login(nome, senha) {
 
     sessionStorage.setItem('operador', JSON.stringify(operador));
 
-    telaDeTroca(operador)
+    telaDeOperacao()
 }
 
-function telaDeTroca(operador) {
-    window.location.href = 'troca.html'
+function telaDeOperacao() {
+    window.location.href = 'operacao.html'
 }
