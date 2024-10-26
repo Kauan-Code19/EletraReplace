@@ -32,5 +32,5 @@ function login(nome, senha) {
 }
 
 function telaDeOperacao() {
-    window.location.href = 'operacao.html'
+    window.location.href = 'setup.html'
 }

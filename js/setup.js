@@ -11,9 +11,9 @@ formSetup.addEventListener('submit', function(event) {
     sessionStorage.setItem('turno', turno)
     sessionStorage.setItem('linha', linha)
 
-    telaDeTroca()
+    telaDeOperacao()
 });
 
-function telaDeTroca() {
-    window.location.href = 'troca.html'
+function telaDeOperacao() {
+    window.location.href = 'operacao.html'
 }

@@ -2,15 +2,15 @@ const buttonTroca = document.getElementById('buttonTroca');
 const buttonDoubleCheck = document.getElementById('buttonDoubleCheck');
 
 buttonTroca.addEventListener('click', function() {
-    telaDeSetup();
+    telaDeTroca();
 });
 
 buttonDoubleCheck.addEventListener('click', function() {
     telaDeDoubleCheck();
 });
 
-function telaDeSetup() {
-    window.location.href = 'setup.html';
+function telaDeTroca() {
+    window.location.href = 'troca.html';
 }
 
 function telaDeDoubleCheck() {

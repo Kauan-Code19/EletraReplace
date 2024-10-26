@@ -32,8 +32,8 @@ const maquinas = {
 };
 
 const Feeders = {
-    indiceF: Array.from({ length: 59 }, (_, i) => `F${i + 1}`),
-    indiceR: Array.from({ length: 59 }, (_, i) => `R${i + 1}`)
+    indiceF: Array.from({ length: 60 }, (_, i) => `F${i + 1}`),
+    indiceR: Array.from({ length: 60 }, (_, i) => `R${i + 1}`)
 }
 
 export function buscarOperadorPorSenha(senha) {
