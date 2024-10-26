@@ -22,22 +22,45 @@ function preencherMaquinas(linhaSelecionada) {
 }
 
 const feeders = buscarTodosOsFeeders()
-const indiceFeederSelect = document.getElementById('indiceFeeder');
 const numeroFeederSelect = document.getElementById('numeroFeeder');
 
-indiceFeederSelect.addEventListener('change', function() {
-    const indiceSelecionado = this.value;
-    const feedersPorIndice = feeders[indiceSelecionado] || [];
+if (numeroFeederSelect) {
+    preencherFeeders(feeders)
+}
 
+function preencherFeeders(feeders) {
+    const feedersF = feeders["indiceF"] || []
+    const feedersR = feeders["indiceR"] || []
     numeroFeederSelect.innerHTML = '<option value="" disabled selected>Selecione o Número do Feeder</option>';
 
-    feedersPorIndice.forEach(numeroFeeder => {
+    feedersF.forEach(numeroFeeder => {
         const option = document.createElement('option');
         option.value = numeroFeeder;
         option.textContent = numeroFeeder;
         numeroFeederSelect.appendChild(option);
     });
-})
+
+    feedersR.forEach(numeroFeeder => {
+        const option = document.createElement('option');
+        option.value = numeroFeeder;
+        option.textContent = numeroFeeder;
+        numeroFeederSelect.appendChild(option);
+    });
+}
+
+maquinaSelect.addEventListener('change', MostarButtonPn);
+numeroFeederSelect.addEventListener('change', MostarButtonPn);
+
+function MostarButtonPn() {
+
+    if (maquinaSelect.value == '' || numeroFeederSelect.value == '') {
+        return
+    }
+
+    document.getElementById("verificarPNBtn1").style.display = ''
+    document.getElementById('buttonTroca').style.display = ''
+    document.getElementById('buttonTroca').disabled = true
+}
 
 let html5QrCode;
 let pns = {
@@ -45,13 +68,23 @@ let pns = {
     componenteDois: null
 };
 
-document.getElementById('verificarPNBtn').addEventListener('click', () => {
+document.getElementById('verificarPNBtn1').addEventListener('click', () => {
     if (!pns.componenteUm && !html5QrCode) {
+        document.getElementById('title').style.display = 'none'
+        document.getElementById('divMaquina').style.display = 'none'
+        document.getElementById('divFeeder').style.display = 'none'
         iniciarLeituraQrCode(1);
-        return;
+        document.getElementById('verificarPNBtn2').style.display = ''
+        document.getElementById('verificarPNBtn1').style.display = 'none'
     }
+});
 
+document.getElementById('verificarPNBtn2').addEventListener('click', () => {
+    document.getElementById('title').style.display = 'none'
+    document.getElementById('divMaquina').style.display = 'none'
+    document.getElementById('divFeeder').style.display = 'none'
     iniciarLeituraQrCode(2); 
+    document.getElementById('verificarPNBtn2').style.display = 'none'
 });
 
 function iniciarLeituraQrCode(componente) {    
@@ -72,12 +105,12 @@ function iniciarLeituraQrCode(componente) {
             if (componente === 1) {
                 pns.componenteUm = partes[5] || ""; 
 
-                alert("PN do Componente 1: " + pns.componenteUm);
+                alert("PN do Componente Anterior: " + pns.componenteUm);
 
             } else if (componente === 2) {
                 pns.componenteDois = partes[5] || ""; 
                 
-                alert("PN do Componente 2: " + pns.componenteDois);
+                alert("PN do Componente Novo: " + pns.componenteDois);
             }
             
             html5QrCode.stop();
@@ -94,16 +127,37 @@ function iniciarLeituraQrCode(componente) {
     });
 }
 
+var PnIgual = true
+
 function compararPNs(pnDoComponenteAnterior, pnDoComponenteNovo) {
     if (pnDoComponenteAnterior !== pnDoComponenteNovo) {
+        document.getElementById('divMaquina').style.display = ''
+        document.getElementById('divFeeder').style.display = ''
         alert("As PNs são diferentes: " + pnDoComponenteAnterior + " vs " + pnDoComponenteNovo);
 
         setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo)
-
+        setPnIgualTrueFalse(false)
         return
     }
 
+    document.getElementById('divMaquina').style.display = ''
+    document.getElementById('divFeeder').style.display = ''
+
     setarElementosComPNIgual(pnDoComponenteAnterior)
+    setPnIgualTrueFalse(true)
+    habilitarButtonTroca()
+}
+
+function setPnIgualTrueFalse(value) {
+    if (value == true) {
+        return
+    }
+
+    PnIgual == false
+}
+
+function habilitarButtonTroca() {
+    document.getElementById('buttonTroca').disabled = false
 }
 
 function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo) {
@@ -113,14 +167,17 @@ function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo
     document.getElementById('pn2InputContainer').style.display = 'block'; 
     document.getElementById('pn2Input').value = pnDoComponenteNovo;
     document.getElementById('pn2Input').ariaRequired = true; 
-    document.getElementById('observacaoContainer').style.display = 'block'; 
+    document.getElementById('observacaoContainer').style.display = 'block';
 }
 
 function setarElementosComPNIgual(pnDoComponenteAnterior) {
     document.getElementById('pnInputContainer').style.display = 'block'; 
     document.getElementById('pnInput').value = pnDoComponenteAnterior;
     document.getElementById('pnInput').ariaRequired = true;
+    document.getElementById('observacao').required = false
 }
+
+document.getElementById('observacao').addEventListener('click', habilitarButtonTroca)
 
 document.getElementById('producaoForm').addEventListener('submit', async(event) => {
     event.preventDefault()
@@ -134,25 +191,17 @@ document.getElementById('producaoForm').addEventListener('submit', async(event) 
 
     if (valoresFormulario.pnIguais) {
         compartilharPdfComPNIgual(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada)
-        limparFormulario()
+        window.location.href = 'troca.html'
         return
     }
 
     if (valoresFormulario.pn1 && valoresFormulario.pn2) {  
         compartilharPdfComPNDiferente(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada)
-        limparFormulario()
+        window.location.href = 'troca.html'
         return
     }
 })
 
-function limparFormulario() {
-    document.getElementById('maquina').value = '';
-    document.getElementById('numeroFeeder').value = '';
-    document.getElementById('pnInput').value = '';
-    document.getElementById('pn1Input').value = '';
-    document.getElementById('pn2Input').value = '';
-    document.getElementById('observacao').value = '';
-}
 
 function pegarValoresDoFormulario() {
     let operadorString = sessionStorage.getItem('operador');
