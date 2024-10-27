@@ -105,19 +105,28 @@ function iniciarLeituraQrCode(componente) {
             if (componente === 1) {
                 pns.componenteUm = partes[5] || ""; 
 
-                alert("PN do Componente Anterior: " + pns.componenteUm);
+                if (pns.componenteUm == "") {
+                    alert("PN do componente anterior esta vazio")
+                } else {
+                    alert("PN do Componente Anterior: " + pns.componenteUm);
+                }
 
             } else if (componente === 2) {
                 pns.componenteDois = partes[5] || ""; 
-                
-                alert("PN do Componente Novo: " + pns.componenteDois);
+
+                if (pns.componenteDois == "") {
+                    alert("PN do componente novo esta vazio")
+                } else {
+                    alert("PN do Componente Novo: " + pns.componenteDois);
+                }
+            }
+
+            if (componente === 2) {
+                compararPNs(pns.componenteUm, pns.componenteDois)
             }
             
             html5QrCode.stop();
 
-            if (pns.componenteUm && pns.componenteDois) {
-                compararPNs(pns.componenteUm, pns.componenteDois);
-            }
         },
         errorMessage => {
             console.log("QR Code não lido: " + errorMessage);
@@ -163,17 +172,31 @@ function habilitarButtonTroca() {
 function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo) {
     document.getElementById('pn1InputContainer').style.display = 'block'; 
     document.getElementById('pn1Input').value = pnDoComponenteAnterior;
-    document.getElementById('pn1Input').ariaRequired = true; 
+    document.getElementById('pn1Input').required = true;
+
+    if (pnDoComponenteAnterior == '') {
+        console.log("ok");
+        
+        document.getElementById('pn1Input').readOnly = false;
+    }
+
     document.getElementById('pn2InputContainer').style.display = 'block'; 
     document.getElementById('pn2Input').value = pnDoComponenteNovo;
-    document.getElementById('pn2Input').ariaRequired = true; 
+    document.getElementById('pn2Input').required = true; 
+
+    if (pnDoComponenteNovo == '') {
+        console.log("ok");
+        
+        document.getElementById('pn2Input').readOnly = false;
+    }
+
     document.getElementById('observacaoContainer').style.display = 'block';
 }
 
 function setarElementosComPNIgual(pnDoComponenteAnterior) {
     document.getElementById('pnInputContainer').style.display = 'block'; 
     document.getElementById('pnInput').value = pnDoComponenteAnterior;
-    document.getElementById('pnInput').ariaRequired = true;
+    document.getElementById('pnInput').required = true;
     document.getElementById('observacao').required = false
 }
 
