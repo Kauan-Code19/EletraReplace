@@ -139,14 +139,17 @@ function iniciarLeituraQrCode(componente) {
 var PnIgual = true
 
 function compararPNs(pnDoComponenteAnterior, pnDoComponenteNovo) {
-    if (pnDoComponenteAnterior !== pnDoComponenteNovo) {
-        document.getElementById('divMaquina').style.display = ''
-        document.getElementById('divFeeder').style.display = ''
-        alert("As PNs são diferentes: " + pnDoComponenteAnterior + " vs " + pnDoComponenteNovo);
 
-        setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo)
-        setPnIgualTrueFalse(false)
-        return
+    if (!(pnDoComponenteAnterior == "" && pnDoComponenteNovo == "")) {
+        if (pnDoComponenteAnterior !== pnDoComponenteNovo) {
+            document.getElementById('divMaquina').style.display = ''
+            document.getElementById('divFeeder').style.display = ''
+            alert("As PNs são diferentes: " + pnDoComponenteAnterior + " vs " + pnDoComponenteNovo);
+    
+            setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo)
+            setPnIgualTrueFalse(false)
+            return
+        }
     }
 
     document.getElementById('divMaquina').style.display = ''
@@ -170,33 +173,31 @@ function habilitarButtonTroca() {
 }
 
 function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo) {
-    document.getElementById('pn1InputContainer').style.display = 'block'; 
-    document.getElementById('pn1Input').value = pnDoComponenteAnterior;
+    document.getElementById('pn1InputContainer').style.display = ''; 
     document.getElementById('pn1Input').required = true;
 
-    if (pnDoComponenteAnterior == '') {
-        console.log("ok");
-        
+    if (pnDoComponenteAnterior == '') {        
         document.getElementById('pn1Input').readOnly = false;
     }
 
-    document.getElementById('pn2InputContainer').style.display = 'block'; 
-    document.getElementById('pn2Input').value = pnDoComponenteNovo;
+    document.getElementById('pn2InputContainer').style.display = ''; 
     document.getElementById('pn2Input').required = true; 
 
     if (pnDoComponenteNovo == '') {
-        console.log("ok");
-        
         document.getElementById('pn2Input').readOnly = false;
     }
 
-    document.getElementById('observacaoContainer').style.display = 'block';
+    document.getElementById('observacaoContainer').style.display = '';
 }
 
 function setarElementosComPNIgual(pnDoComponenteAnterior) {
-    document.getElementById('pnInputContainer').style.display = 'block'; 
-    document.getElementById('pnInput').value = pnDoComponenteAnterior;
+    document.getElementById('pnInputContainer').style.display = ''; 
     document.getElementById('pnInput').required = true;
+
+    if (pnDoComponenteAnterior == '') {    
+        document.getElementById('pnInput').readOnly = false;
+    }
+
     document.getElementById('observacao').required = false
 }
 
