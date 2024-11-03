@@ -101,7 +101,7 @@ function iniciarLeituraQrCode(componente) {
         },
         qrCodeMessage => {
             const partes = qrCodeMessage.split(" ");
-            
+
             if (componente === 1) {
                 pns.componenteUm = partes[5] || ""; 
 
@@ -142,10 +142,16 @@ function compararPNs(pnDoComponenteAnterior, pnDoComponenteNovo) {
     if (pnDoComponenteAnterior !== pnDoComponenteNovo) {
         document.getElementById('divMaquina').style.display = ''
         document.getElementById('divFeeder').style.display = ''
-        alert("As PNs são diferentes: " + pnDoComponenteAnterior + " vs " + pnDoComponenteNovo);
 
         setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo)
         setPnIgualTrueFalse(false)
+
+        var myModal = new bootstrap.Modal(document.getElementById('exampleModalWarning'));
+        
+        const alertElement = document.getElementById('alertMessageWarning');
+        alertElement.querySelector('div').textContent = "AS PNS NÃO COINCIDEM";
+        myModal.show();
+
         return
     }
 
@@ -154,6 +160,17 @@ function compararPNs(pnDoComponenteAnterior, pnDoComponenteNovo) {
 
     setarElementosComPNIgual(pnDoComponenteAnterior)
     setPnIgualTrueFalse(true)
+
+    if (PnIgual) {
+        var myModal = new bootstrap.Modal(document.getElementById('exampleModalSuccess'));
+        
+        const alertElement = document.getElementById('alertMessageSuccess');
+
+        alertElement.querySelector('div').textContent = "AS PNS COINCIDEM";
+
+        myModal.show();
+    }
+
     habilitarButtonTroca()
 }
 
@@ -209,19 +226,22 @@ document.getElementById('producaoForm').addEventListener('submit', async(event) 
 
     const dataHoraFormatada = formatarDataHora();
     
-    let pdfUrl = criarPdfUrl(valoresFormulario, dataHoraFormatada)
     let pdfBlob =  criarPdfBlob(valoresFormulario, dataHoraFormatada)
 
     if (valoresFormulario.pnIguais) {
-        compartilharPdfComPNIgual(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada)
-        window.location.href = 'troca.html'
-        return
+        compartilharPdfComPN(pdfBlob, valoresFormulario, dataHoraFormatada, 'igual');
+        setTimeout(() => {
+            window.location.href = 'troca.html';
+        }, 3000); 
+        return;
     }
-
-    if (valoresFormulario.pn1 && valoresFormulario.pn2) {  
-        compartilharPdfComPNDiferente(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada)
-        window.location.href = 'troca.html'
-        return
+    
+    if (valoresFormulario.pn1 && valoresFormulario.pn2) {
+        compartilharPdfComPN(pdfBlob, valoresFormulario, dataHoraFormatada, 'diferente');
+        setTimeout(() => {
+            window.location.href = 'troca.html';
+        }, 3000);
+        return;
     }
 })
 
@@ -257,16 +277,6 @@ function criarPdfBlob(valoresFormulario, dataHoraFormatada) {
     return pdfBlob
 }
 
-function criarPdfUrl(valoresFormulario, dataHoraFormatada) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    let documentComText = definirTextDoFormulario(doc, valoresFormulario, dataHoraFormatada)
-
-    const pdfBlob = documentComText.output('blob');
-    return URL.createObjectURL(pdfBlob)
-}
-
 function definirTextDoFormulario(doc, valoresFormulario, dataHoraFormatada) {
     doc.text(`Ordem de Produção: ${valoresFormulario.ordemProducao}`, 10, 10);
     doc.text(`Turno: ${valoresFormulario.turno}`, 10, 20);
@@ -292,39 +302,45 @@ function definirTextDoFormulario(doc, valoresFormulario, dataHoraFormatada) {
     return doc
 }
 
-function compartilharPdfComPNIgual(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada) {    
-    if (navigator.share) {
-        navigator.share({
-            title: 'Registro de Troca',
-            files: [new File([pdfBlob], 
-                `OP${valoresFormulario.ordemProducao}_PN${valoresFormulario.pnIguais}
-                _dataHora${dataHoraFormatada}.pdf`, { type: 'application/pdf' })]
-        }).catch(error => console.error('Erro ao compartilhar:', error));
-    } else {
-        alert("O compartilhamento não é suportado neste navegador.");
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `OP${valoresFormulario.ordemProducao}_PN${valoresFormulario.pnIguais}
-        _dataHora${dataHoraFormatada}.pdf`
-        link.click();
-    }
-}
 
-function compartilharPdfComPNDiferente(pdfUrl, pdfBlob, valoresFormulario, dataHoraFormatada) {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Registro de Troca',
-            files: [new File([pdfBlob], 
-                `OP${valoresFormulario.ordemProducao}_PN1${valoresFormulario.pn1}
-                _PN2${valoresFormulario.pn2}_dataHora${dataHoraFormatada}.pdf`, { type: 'application/pdf' })]
-        }).catch(error => console.error('Erro ao compartilhar:', error));
-    } else {
-        alert("O compartilhamento não é suportado neste navegador.");
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `_OP${valoresFormulario.ordemProducao}_PN1${valoresFormulario.pn1}
-        _PN2${valoresFormulario.pn2} dataHora${dataHoraFormatada}.pdf`
-        link.click();
+async function compartilharPdfComPN(pdfBlob, valoresFormulario, dataHoraFormatada, tipoPN) {
+
+    const botToken = "7217688430:AAG7f_TWBTEfPC9A6c6L9oZkv6_pCTSdATM";
+    const chatId = "-4553940418";
+    const url = `https://api.telegram.org/bot${botToken}/sendDocument`;
+
+    const nomeArquivo = tipoPN === 'igual' 
+        ? `OP${valoresFormulario.ordemProducao}_PN${valoresFormulario.pnIguais}_dataHora${dataHoraFormatada}.pdf`
+        : `OP${valoresFormulario.ordemProducao}_PN1${valoresFormulario.pn1}_PN2${valoresFormulario.pn2}_dataHora${dataHoraFormatada}.pdf`;        
+
+    const formData = new FormData();
+    formData.append('chat_id', chatId);
+    formData.append('document', pdfBlob, nomeArquivo);
+
+    try {
+        // Envia o PDF para o bot
+        const response = await fetch(url, {
+            method: "POST",
+            body: formData
+        });
+        
+        if (response.ok) {
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModalSuccess'));
+        
+            const alertElement = document.getElementById('alertMessageSuccess');
+
+            alertElement.querySelector('div').textContent = "TROCA REGISTRADA COM SUCESSO";
+
+            myModal.show();
+        } else {
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModalWarning'));
+        
+            const alertElement = document.getElementById('alertMessageWarning');
+            alertElement.querySelector('div').textContent = "FALHA AO TENTAR REGISTRAR TROCA";
+            myModal.show();
+        }
+    } catch (error) {
+        alert("Erro ao enviar o PDF: " + error.message);
     }
 }
 
