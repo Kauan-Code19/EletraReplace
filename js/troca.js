@@ -192,8 +192,6 @@ function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo
     document.getElementById('pn1Input').required = true;
 
     if (pnDoComponenteAnterior == '') {
-        console.log("ok");
-        
         document.getElementById('pn1Input').readOnly = false;
     }
 
@@ -202,12 +200,11 @@ function setarElementosComPNDiferente(pnDoComponenteAnterior, pnDoComponenteNovo
     document.getElementById('pn2Input').required = true; 
 
     if (pnDoComponenteNovo == '') {
-        console.log("ok");
-        
         document.getElementById('pn2Input').readOnly = false;
     }
 
     document.getElementById('observacaoContainer').style.display = 'block';
+    document.getElementById('divQuantidade').style.display = 'block';
 }
 
 function setarElementosComPNIgual(pnDoComponenteAnterior) {
@@ -215,9 +212,22 @@ function setarElementosComPNIgual(pnDoComponenteAnterior) {
     document.getElementById('pnInput').value = pnDoComponenteAnterior;
     document.getElementById('pnInput').required = true;
     document.getElementById('observacao').required = false
+    document.getElementById('divQuantidade').style.display = 'block';
 }
 
 document.getElementById('observacao').addEventListener('click', habilitarButtonTroca)
+
+const selectQuantidade = document.getElementById('quantidade');
+
+selectQuantidade.addEventListener('change', () => {
+    if (!selectQuantidade.value == 'naoCheio') {
+        return
+    }
+
+    document.getElementById('divQuantidade').style.display = 'none';
+
+    document.getElementById('divNumeroQuantidade').style.display = 'block';
+})
 
 document.getElementById('producaoForm').addEventListener('submit', async(event) => {
     event.preventDefault()
@@ -263,7 +273,9 @@ function pegarValoresDoFormulario() {
         pnIguais: document.getElementById('pnInput').value,
         pn1: document.getElementById('pn1Input').value,
         pn2: document.getElementById('pn2Input').value,
-        observacao: document.getElementById('observacao').value
+        observacao: document.getElementById('observacao').value,
+        quantidadeCheio: document.getElementById('quantidade').value,
+        quantidadeNaoCheio: document.getElementById('numeroQuantidade').value
     };
 }
 
@@ -286,17 +298,23 @@ function definirTextDoFormulario(doc, valoresFormulario, dataHoraFormatada) {
     doc.text(`Máquina: ${valoresFormulario.maquina}`, 10, 60);
     doc.text(`Número do Feeder: ${valoresFormulario.numeroFeeder}`, 10, 70);
 
+    if (valoresFormulario.quantidadeCheio == "Cheio") {
+        doc.text(`Quantidade: ${valoresFormulario.quantidadeCheio}`, 10, 80)
+    } else {
+        doc.text(`Quantidade: ${valoresFormulario.quantidadeNaoCheio}`, 10, 80)
+    }
+
     if (valoresFormulario.pnIguais) {
-        doc.text(`Part Number: ${valoresFormulario.pnIguais}`, 10, 80);
+        doc.text(`Part Number: ${valoresFormulario.pnIguais}`, 10, 90);
     }
 
     if (valoresFormulario.pn1 && valoresFormulario.pn2) {
-        doc.text(`Part Number 1: ${valoresFormulario.pn1}`, 10, 80);
-        doc.text(`Part Number 2: ${valoresFormulario.pn2}`, 10, 90);
+        doc.text(`Part Number 1: ${valoresFormulario.pn1}`, 10, 90);
+        doc.text(`Part Number 2: ${valoresFormulario.pn2}`, 10, 100);
     }
 
     if (valoresFormulario.observacao) {
-        doc.text(`Observação: ${valoresFormulario.observacao}`, 10, 100);
+        doc.text(`Observação: ${valoresFormulario.observacao}`, 10, 110);
     }
 
     return doc
