@@ -97,6 +97,17 @@
                         <label for="observcao" class="form-label">Adicione uma observacao</label>
                         <input type="text" class="form-control" id="observacao" placeholder="Digite a observação" required>
                     </div>
+                    <div class="mb-3" style="display: none;" id="divQuantidade">
+                        <label for="quantidade" class="form-label">Quantidade</label>
+                        <select class="form-select" id="quantidade" required>
+                            <option value="Cheio" selected>Cheio</option>
+                            <option value="naoCheio">Alterar Quantidade</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" style="display: none;" id="divNumeroQuantidade">
+                        <label for="numeroQuantidade" class="form-label">Quantidade</label>
+                        <input type="number" class="form-control" id="numeroQuantidade">
+                    </div>
                     <div class="mb-3">
                         <button type="button" class="btn btn-secondary w-100 mb-1" id="verificarPNBtn1" style="display: none;">Escanear Componente Anterior (PN)</button>
                         <div id="reader"></div>
